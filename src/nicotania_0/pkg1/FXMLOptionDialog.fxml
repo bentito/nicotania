@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nicotania_0.pkg1.FXMLOptionDialogController">
+    <stylesheets>
+        <URL value="@caspian.css" />
+    </stylesheets>
+   <children>
+      <TabPane fx:id="prefsTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <tabs>
+          <Tab text="General Settings">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="249.0" prefWidth="200.0" />
+            </content>
+          </Tab>
+          <Tab text="Statistics">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="saveButton" contentDisplay="CENTER" defaultButton="true" layoutX="515.0" layoutY="316.0" mnemonicParsing="false" onAction="#handleSaveButton" text="Save" />
+                        <TextField fx:id="win1TextField" layoutX="121.0" layoutY="38.0" prefHeight="25.0" prefWidth="44.0" text="100" />
+                        <Label layoutX="22.0" layoutY="27.0" prefHeight="48.0" prefWidth="95.0" text="Window 1 Size:" />
+                        <Label layoutX="22.0" layoutY="56.0" prefHeight="48.0" prefWidth="95.0" text="Window 2 Size:" />
+                        <TextField fx:id="win2TextField" layoutX="121.0" layoutY="68.0" prefHeight="25.0" prefWidth="44.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</AnchorPane>

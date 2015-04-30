@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="Nicotania.jnlp">
+  <information>
+    <title>Nicotania</title>
+    <vendor>Unknown vendor</vendor>
+    <description>Sample JavaFX 2.0 application.</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <jfx:javafx-runtime version="2.2+" href="http://javadl.sun.com/webapps/download/GetFile/javafx-latest/windows-i586/javafx2.jnlp"/>
+  </resources>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="Nicotania_0.1.jar" size="161484" download="eager" />
+    <jar href="lib/sqlite-jdbc-3.8.7.jar" size="3970650" download="eager" />
+    <jar href="lib/commons-math3-3.4.1.jar" size="2172665" download="eager" />
+    <jar href="lib/extfx-0.3.jar" size="144936" download="eager" />
+    <jar href="lib/guava-19.0.0.jar" size="2410573" download="eager" />
+  </resources>
+  <applet-desc  width="0" height="0" main-class="com.javafx.main.NoJavaFXFallback"  name="Nicotania" >
+    <param name="requiredFXVersion" value="2.2+"/>
+  </applet-desc>
+  <jfx:javafx-desc  width="0" height="0" main-class="nicotania_0.pkg1.Nicotania_01"  name="Nicotania" />
+  <update check="background"/>
+</jnlp>
