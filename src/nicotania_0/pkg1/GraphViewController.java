@@ -167,20 +167,18 @@ public class GraphViewController implements Initializable {
         try {
             while (rs.next()) {
                 Calendar cal = Calendar.getInstance();
-                
+
                 cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(rs.getString("Hour")));
                 cal.set(Calendar.MINUTE, Integer.parseInt(rs.getString("Minute")));
                 cal.set(Calendar.SECOND, Integer.parseInt(rs.getString("Second")));
                 Date hourMinSec = cal.getTime();
 
-                nicotineSeries.getData().add(new XYChart.Data(hourMinSec,
-                        Integer.parseInt(rs.getString("NicLevel"))));
-                temperatureSeries.getData().add(new XYChart.Data(hourMinSec,
-                        Integer.parseInt(rs.getString("Temp"))));
-                fileTags.add(rs.getString("FileTag"));
-
                 nicReading = Integer.parseInt(rs.getString("NicLevel"));
-                tempReading = Integer.parseInt(rs.getString("Temp"));
+                tempReading = convertToCelsius(Integer.parseInt(rs.getString("Temp")));
+
+                nicotineSeries.getData().add(new XYChart.Data(hourMinSec,nicReading));
+                temperatureSeries.getData().add(new XYChart.Data(hourMinSec,tempReading));
+                fileTags.add(rs.getString("FileTag"));
 
                 if (nicReading < lowestNicReading) {
                     lowestNicReading = nicReading;
@@ -210,7 +208,7 @@ public class GraphViewController implements Initializable {
 
         final DateAxis xAxis = new DateAxis();
         final NumberAxis yAxis = new NumberAxis(lowestNicReading - 20, highestNicReading + 20, 5.0); // 5 is tick distance
-        final NumberAxis yAxisTemp = new NumberAxis(lowestTempReading - 20, highestTempReading + 20, 5.0); // 5 is tick distance
+        final NumberAxis yAxisTemp = new NumberAxis(lowestTempReading -1, highestTempReading+1, 1.0); // 5 is tick distance
 
         final LineChart<Date, Number> lc = new LineChart<>(xAxis, yAxis);
         final LineChart<Date, Number> lcTemp = new LineChart<>(xAxis, yAxisTemp);
@@ -327,5 +325,12 @@ public class GraphViewController implements Initializable {
 //                timer.schedule(task, new Date(), 300);
 //            }
 //        }).start();
+    }
+
+    private double convertToCelsius(int resistanceTemp) {
+        double celTemp = 0;
+        double v = resistanceTemp/(4096.0*3.0);
+        celTemp = Math.abs(1.866-v/0.01169);
+        return celTemp;
     }
 }
