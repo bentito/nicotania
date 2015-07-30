@@ -81,7 +81,11 @@ public class MainDocumentController implements Initializable {
         }
 
         if (db.dbToUse != null || checkDefaultDBPresent()) {
-            loggingTextArea.appendText("\nAnalysis for default database file: " + db.dbToUse + "\n");
+            loggingTextArea.appendText("\nAnalysis for database file: " + db.dbToUse + "\n");
+            
+            // testing only - debug only
+//            SVMScale svm = new SVMScale(db); //debug
+            
             RSOrderedGrab rsog = new RSOrderedGrab(loggingTextArea, dbLoadedLabel.getText());
             ResultSet rs = rsog.executeQuery();
             DescriptiveStatistics stats = new DescriptiveStatistics();
@@ -112,6 +116,9 @@ public class MainDocumentController implements Initializable {
                     stats.addValue(nicLevel);
                     rollingStats.addValue(nicLevel);
                     ArrayList<String> timeDate = new ArrayList<>(); // put: day, hour, min, sec -- in that order
+                    //TODO: figure out a way to modify time date to include filetag so that we can differentiate overlapping data from the shimmers
+                    // one way might be to include FileTag in the Order By field of the SQL query as that at least straigtens them out a bit, but need to think
+                    // more about how to get these maximums to be per dataset (meaning FileTag grouping) rather than just for all the data in the db table
                     timeDate = putTimeDate(rs.getString("Day"), rs.getString("Hour"), rs.getString("Minute"), rs.getString("Second"));
 
                     if ((stats.getN() % windowSize1) == 0) {
@@ -202,8 +209,8 @@ public class MainDocumentController implements Initializable {
 //        if (lsf != null && files != null) {
         loggingTextArea.appendText("\n");
         loggingTextArea.appendText("Loading data into database. Will take a minute or two.\n");
-        new Thread(new Runnable() {
-            public void run() {
+//        new Thread(new Runnable() {
+//            public void run() {
                 LoadShimmerFiles lsf = null;
                 ArrayList<String> files = null;
                 if (selectedDirectory == null) {
@@ -215,24 +222,24 @@ public class MainDocumentController implements Initializable {
                 try {
                     lsf.loadAllFileData();
                 } catch (Exception e) {
+                    System.err.println("Error on loading all file data: " + e.getClass().getName() + ": " + e.getMessage());
                 }
 
                 // we are not in the event thread currently so we should not update the UI here
                 // this is a good place to do some slow, background loading, e.g. load from a server or from a file system 
-                Platform.runLater(new Runnable() {
-                    public void run() {
+//                Platform.runLater(new Runnable() {
+//                    public void run() {
                         // we are now back in the EventThread and can update the GUI
                         loggingTextArea.appendText("Completed database insertions.\n");
-                    }
-                });
-
-            }
-        }).start();
+//                    }
+//                });
+//
+//            }
+//        }).start();
     }
 
     @FXML
-    private void handleLoadDbAction(ActionEvent event
-    ) {
+    private void handleLoadDbAction(ActionEvent event) {
         Stage stage = (Stage) stageX.getScene().getWindow();
         DirectoryChooser directoryChooser = new DirectoryChooser();
         FileChooser fileChooser = new FileChooser();

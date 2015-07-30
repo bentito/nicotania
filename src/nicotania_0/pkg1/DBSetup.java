@@ -54,8 +54,8 @@ public class DBSetup {
             System.out.println("Opened database successfully");
             stmt = conn.createStatement();
             String sql = null;
-//            sql = "DROP TABLE IF EXISTS " + tableName + ";";
-//            stmt.executeUpdate(sql);
+            sql = "DROP TABLE IF EXISTS " + tableName + ";";
+            stmt.executeUpdate(sql);
             sql = "CREATE TABLE IF NOT EXISTS " + tableName
                     + " (ID INTEGER PRIMARY KEY AUTOINCREMENT," //0
                     + " FileTag TEXT NOT NULL,"//                 1  

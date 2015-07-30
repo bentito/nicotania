@@ -67,7 +67,7 @@ public class Nicotania_01 extends Application {
                 Scene optScene = new Scene(optDialog);
                 dialog.setScene(optScene);
                 dialog.show();
-                
+
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -108,7 +108,7 @@ public class Nicotania_01 extends Application {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) {        
         launch(args);
     }
 

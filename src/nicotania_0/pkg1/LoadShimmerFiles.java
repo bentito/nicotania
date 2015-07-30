@@ -66,7 +66,7 @@ public class LoadShimmerFiles {
         ArrayList items = new ArrayList<>();
 
         DBSetup dbd = new DBSetup();
-        
+
         Connection conn = dbd.makeConn();
         dbd.dbToUse = new File(dbd.defaultDB);
         dbd.createTable();
@@ -75,20 +75,29 @@ public class LoadShimmerFiles {
         Statement stmt = conn.createStatement();
 
         for (Path path : paths) {
-            String fileTag = getFileTag(path);
-            try (BufferedReader reader = Files.newBufferedReader(path, Charset.defaultCharset())) {
-                String line = null;
-                while ((line = reader.readLine()) != null) {
-                    items = lineSplitter(line);
-                    insertItems(stmt, items, fileTag);
-//                    conn.commit();
+            if (!path.endsWith(".DS_Store")) { // MacOS fix
+                String fileTag = getFileTag(path);
+                try (BufferedReader reader = Files.newBufferedReader(path, Charset.defaultCharset())) {
+                    String line = null;
+                    while ((line = reader.readLine()) != null) {
+                        try {
+                            items = lineSplitter(line);
+                            insertItems(stmt, items, fileTag);
+                        } catch (Exception ex) {
+                            System.err.println("Bogus input line ignored: " + line);
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error in loading all file data: " + e.getClass().getName() + ": " + e.getMessage());
+                    System.err.println("Path was: " + path);
+                    System.err.println("File Tag was:" + fileTag);
                 }
-            } catch (IOException x) {
-                System.err.format("IOException: %s%n", x);
             }
         }
-        conn.commit(); // this IS a lot faster
+
+        conn.commit(); // commit all inserts at once -- as long as autocommit is false
         conn.close();
+        System.out.println("debug: conn commit and close called");
     }
 
     private void insertItems(Statement stmt, ArrayList items, String fileTag) {
@@ -122,75 +131,82 @@ public class LoadShimmerFiles {
 
     ArrayList lineSplitter(String line) {
         // this is a line: 30:23:59:59:DHMS:NTH:01f7,089b,05b2
+
         ArrayList items = new ArrayList<>();
-        int fieldCnt = 0;
-        String values = null;
-        for (String item : line.split(":")) {
-            switch (fieldCnt) {
-                case 0:
-                    if (!hasHex(item)) {
-                        Integer day = Integer.valueOf(item);
-                        items.add(day);
-                    } else {
-                        items.add(31+Integer.parseInt(item, 16)); //gotta put something here, so day "31+dec(hex)"
-                    }
-                    break;
-                case 1:
-                    Integer hour = Integer.valueOf(item);
-                    items.add(hour);
-                    break;
-                case 2:
-                    Integer min = Integer.valueOf(item);
-                    items.add(min);
-                    break;
-                case 3:
-                    Integer sec = Integer.valueOf(item);
-                    items.add(sec);
-                    break;
-                case 4:
+        try {
+            int fieldCnt = 0;
+            String values = null;
+            for (String item : line.split(":")) {
+                switch (fieldCnt) {
+                    case 0:
+                        if (!hasHex(item)) {
+                            Integer day = Integer.valueOf(item);
+                            items.add(day);
+                        } else {
+                            items.add(31 + Integer.parseInt(item, 16)); //gotta put something here, so day "31+dec(hex)"
+                        }
+                        break;
+                    case 1:
+                        Integer hour = Integer.valueOf(item);
+                        items.add(hour);
+                        break;
+                    case 2:
+                        Integer min = Integer.valueOf(item);
+                        items.add(min);
+                        break;
+                    case 3:
+                        Integer sec = Integer.valueOf(item);
+                        items.add(sec);
+                        break;
+                    case 4:
 //                    String dayFields = item;
 //                    items.add(dayFields);
-                    break;
-                case 5:
+                        break;
+                    case 5:
 //                    String valueFields = item;
 //                    items.add(valueFields);
-                    break;
-                case 6:
-                    values = item;
-                    break;
-                default:
-                    break;
+                        break;
+                    case 6:
+                        values = item;
+                        break;
+                    default:
+                        break;
+                }
+                fieldCnt++;
             }
-            fieldCnt++;
-        }
 
-        fieldCnt = 0;
-        for (String valItem : values.split(",")) {
-            switch (fieldCnt) {
-                case 0:
-                    Integer nicLevel = Integer.parseInt(valItem, 16);
-                    items.add(nicLevel);
-                    break;
-                case 1:
-                    Integer temp = Integer.parseInt(valItem, 16);
-                    items.add(temp);
-                    break;
-                case 2:
-                    Integer humidity = Integer.parseInt(valItem, 16);
-                    items.add(humidity);
-                    break;
-                default:
-                    break;
+            fieldCnt = 0;
+            for (String valItem : values.split(",")) {
+                switch (fieldCnt) {
+                    case 0:
+                        Integer nicLevel = Integer.parseInt(valItem, 16);
+                        items.add(nicLevel);
+                        break;
+                    case 1:
+                        Integer temp = Integer.parseInt(valItem, 16);
+                        items.add(temp);
+                        break;
+                    case 2:
+                        Integer humidity = Integer.parseInt(valItem, 16);
+                        items.add(humidity);
+                        break;
+                    default:
+                        break;
+                }
+                fieldCnt++;
             }
-            fieldCnt++;
+        } catch (NumberFormatException ne) {
+            System.err.println("Error splitting data line: " + ne.getClass().getName() + ": " + ne.getMessage());
+            throw ne;
         }
         return items;
+
     }
 
     private String getFileTag(Path path) {
         String fileTag = path.toString();
         int idxStringToSearchOn = fileTag.lastIndexOf("/", fileTag.length());
-        idxStringToSearchOn = fileTag.lastIndexOf("/", idxStringToSearchOn-1);
+        idxStringToSearchOn = fileTag.lastIndexOf("/", idxStringToSearchOn - 1);
         fileTag = fileTag.substring(idxStringToSearchOn, fileTag.length());
         fileTag += "/";
         return fileTag;

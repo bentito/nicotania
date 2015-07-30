@@ -30,12 +30,22 @@ public class RSGrab {
 
     Connection conn = null;
     String SQL = null;
-    
+
     public RSGrab(String dbToUseStr) {
         try {
             Class.forName("org.sqlite.JDBC");
             DBSetup db = new DBSetup();
             db.dbToUse = new File(dbToUseStr);
+            conn = db.makeConn();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(RSGrab.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public RSGrab(DBSetup db) {
+        try {
+            Class.forName("org.sqlite.JDBC");
             conn = db.makeConn();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(RSGrab.class.getName()).log(Level.SEVERE, null, ex);
@@ -74,6 +84,7 @@ public class RSGrab {
         SQL += "Hour = ";
         SQL += hour;
         SQL += ";";
+//         SQL += " ORDER BY Day, Hour, Minute, Second, FileTag;";//debug testing
     }
 
 }
